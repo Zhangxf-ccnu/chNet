@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1576138465015.000,
+    "dirty" : false,
+    "encoding" : "CP936",
+    "folds" : "",
+    "hash" : "1715960209",
+    "id" : "EC94277B",
+    "lastKnownWriteTime" : 1602651476,
+    "last_content_update" : 1602651476,
+    "path" : "C:/Users/adaline_juan/Desktop/chNet/R/generate.data.R",
+    "project_path" : "R/generate.data.R",
+    "properties" : {
+        "cursorPosition" : "6,23",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,9 @@
+# Simulation data
+data.x= generate.data(p = 100, n = 100, umin = 0.5, umax = 1)
+result = chNet(data.x$X,data.x$group, lambar = 3, parallel = FALSE, nCpus = 4)
+# TCGA breast cancer data
+data("TCGA.BRCA")
+result = chNet(TCGA.BRCA$X,TCGA.BRCA$group, lambar = 2.85, parallel = FALSE, nCpus = 4)
+# GSE13159 AML
+data("GSE13159.AML")
+result = chNet(TCGA.BRCA$X,TCGA.BRCA$group, lambar = 2.7, parallel = FALSE, nCpus = 4)

@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1576138429918.000,
+    "dirty" : false,
+    "encoding" : "CP936",
+    "folds" : "",
+    "hash" : "4277716634",
+    "id" : "DB06FF42",
+    "lastKnownWriteTime" : 1576981421,
+    "last_content_update" : 1576981421723,
+    "path" : "D:/personalfile/FDR_convex/chNet/R/data.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "13,8",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

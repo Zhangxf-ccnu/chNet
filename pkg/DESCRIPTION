@@ -1,0 +1,17 @@
+Package: chNet
+Type: Package
+Title:Differential network analysis by simultaneously considering changes in gene interactions and gene expression.
+Version: 1.0.0
+Author: Jia-Juan Tu
+Maintainer: Jia-Juan Tu <adaline_juan@mails.ccnu.edu.cn>
+Description: chNet is a method designed for  inferring diffferential network that satisfy hierarchichal constraints. chNet can simultaneously take into account the change of gene interactions and gene expression.
+Depends: R(>= 3.5.1)
+Imports: MASS, Matrix, igraph, mvtnorm, glmnet 
+Suggests: knitr, 
+          rmarkdown
+VignetteBuilder: knitr
+RoxygenNote: 6.1.1
+License: GPL(>= 2)
+Encoding: UTF-8
+LazyData: true
+

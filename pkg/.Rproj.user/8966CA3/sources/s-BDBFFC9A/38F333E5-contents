@@ -1,0 +1,22 @@
+#' @title  Acute myeloid leukemia data (GSE13159)
+#' @description Gene expression datasets for acute myeloid leukemia (GSE13159) is download from http://discern-leelab.cs.washington.ed.
+#' There are 541 AML cancers and 73 normal samples.
+#' The data only include expression measurements of genes that overlap
+#' with the mTOR signaling pathway (hsa04150)  from the Kyoto Encyclopedia of
+#' Genes and Genomes databas. It includes an expression matrix for which the rows represent the
+#' samples and the columns represent the genes, and a vector denoting the group membership of each
+#' sample.
+#' @usage data("GSE13159.AML")
+#' @source [1] The Cancer Genome Atlas Research Network (2012), Comprehensive molecular portraits of human breast tumors. Nature. 490 (7418), 61-70. (http://cancergenome.nih.gov/).
+
+#' @references  Jia-Juan Tu, Le Ou-Yang, Hong Yan, Xiao-Fei Zhang and Hong Qin (2020), Differential network analysis
+#'  by simultaneously considering the change of gene interactions and gene expression.
+#' @author Jia-Juan Tu
+#' @seealso { \code{\link{generate.data}},  \code{\link{chNet}},\code{\link{TCGA.BRCA}}}
+
+#' @examples
+#' data("GSE13159.AML")
+
+"GSE13159.AML"
+
+

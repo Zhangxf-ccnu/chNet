@@ -1,0 +1,250 @@
+remove(list=ls())
+#http://www.haematologica.org/content/95/5/819.short
+load("AMLm.Rdata") 
+
+dat = GSE13159.AML$X
+group = GSE13159.AML$group
+p=dim(dat)[2]
+
+source("STARR.R")
+a=STARR(dat, group, N =20)
+
+esta=as.matrix(a$finalMatrix)
+lambda_star=2.5
+esta[abs(esta)>lambda_star]=1
+esta[esta!=1]=0
+sum(esta)
+t1=apply(esta,1,sum)
+tt=t1/20
+2*(sum(tt*(1 - tt))/(p*(p - 1)))
+
+az=matrix(tt,p,p)
+save(az, file="netpromPIK.Rdata")
+#####
+
+lambda_star =2.5
+source("STAR_R.R")
+a=STAR_R (dat, group, lambda_star,N =20, beta=0.05)
+
+
+
+#####################################################################
+###################################################################
+##################网络的边数
+remove(list=ls())
+
+source("compute.statis.R")
+source("get.knots.R")
+
+load("AMLm.Rdata") 
+
+dat = GSE13159.AML$X
+group = GSE13159.AML$group
+p=dim(dat)[2]
+
+genename = colnames(dat)
+cc=compute.statis(dat,group )
+knots <- get.knots(cc$tmu, cc$trho)
+
+main_temp=knots$main.knots
+
+int_temp=knots$int.knots
+diag(int_temp)=0
+
+lam_star = 2.7
+
+est_main=(main_temp>lam_star)*main_temp
+est_main1=est_main
+est_main1[est_main1!=0]=1
+sum(est_main1)
+
+est_int = (int_temp>lam_star)*int_temp
+est_int1=est_int
+est_int1[est_int1!=0]=1
+est_int1=upper.tri(est_int1)*est_int1
+sum(est_int1)
+
+
+indm=which(est_main1!=0)
+main_edge = genename[indm]
+
+##### 比对交集
+ab=est_int1+t(est_int1)
+aq=apply(abs(ab),2,sum)
+aq[aq!=0]=1
+sum(aq)
+
+##
+load("netprom.Rdata")
+#az=matrix(1,p,p)
+est_int2=est_int1*az
+diff_gene_lable=c()
+diff_edge=c()
+for(i in 1:p){
+  for(j in 1:p){
+    if(est_int2[i ,j]!= 0){
+      temp_edge=c(genename[i],genename[j])
+      temp_edge_lable = c(genename[i],genename[j],az[i,j])
+      diff_edge=rbind(temp_edge,diff_edge)
+      diff_gene_lable=rbind(temp_edge_lable, diff_gene_lable)
+    }
+  }
+  
+}
+sortgene = sort(table(diff_edge),decreasing = TRUE)
+
+length(sortgene)
+lenhub=8
+sortgene[1:lenhub]
+hubgene=rownames(sortgene)[1:lenhub]
+###the weight degree of genes 
+degene.temp=apply(est_int2+t(est_int2),1,sum)
+hub.ind.temp=sort(degene.temp,decreasing = TRUE)[1:lenhub]
+hub.ind=unique(hub.ind.temp)
+hub_indx=c()
+for(i in  1:length(unique(hub.ind))){
+  hub_ind_temp=which(degene.temp==hub.ind[i])
+  print(hub_ind_temp)
+  hub_indx=c(hub_indx,hub_ind_temp)
+}
+hub.degree.gene=genename[hub_indx]
+hub.degree = cbind(hub.degree.gene,hub.ind.temp)
+setdiff(hub.degree.gene,main_edge)
+
+### ttest 
+x1=dat[which(group==unique(group)[1]),]
+x2=dat[which(group==unique(group)[2]),]
+
+intergene= row.names(as.matrix(sortgene))
+a1=setdiff(main_edge,intergene) 
+a2=intersect(main_edge,intergene) 
+a3=setdiff(intergene,main_edge)
+indlable=c()
+a2=main_edge
+for (ij in 1: length(a2)){
+print(t.test(x1[,a2[ij]],x2[,a2[ij]])$p.value)
+  
+}
+
+
+#######333
+myfile= paste0( "diff_edge","_",'lam_star',lam_star,".txt")
+
+write.csv(diff_edge,myfile, row.names=F)
+
+
+myfile1= paste0( "main_edge","_",'lam_star',lam_star,".txt")
+
+write.csv(main_edge,myfile1, row.names=F)
+
+
+myfile2= paste0( "hub_edgep","_",'lam_star',lam_star,".txt")
+
+write.csv(hubgene,myfile2, row.names=F)
+
+myfile21= paste0( "hub_degree","_",'lam_star',lam_star,".txt")
+
+write.csv(hub.degree,myfile21, row.names=F)
+
+
+myfile3= paste0( "intergene","_",'lam_star',lam_star,".txt")
+
+write.csv(intergene,myfile3, row.names=F)
+
+myfile6= paste0( "diff_edge","_",'lam_star',lam_star,".csv")
+
+write.csv(diff_edge,myfile6, row.names=F)
+
+myfile7= paste0( "diff_gene_lable","_",'lam_star',lam_star,".csv")
+
+write.csv(diff_gene_lable,myfile7, row.names=F)
+
+################################
+options(digits=3)
+#ab=setdiff(intergene,main_edge)
+ab=setdiff(main_edge,intergene) 
+for (i  in 1:length(ab))
+{
+  ttset=t.test(Ressam[,ab[i]],Sensam[,ab[i]])
+  
+  cat("pvalue=",ttset$p.value)
+  print( ab[i])
+  #print(ttset$p.value)
+  
+}
+
+#####
+library(VennDiagram)
+#main_edge,intergene
+venn_list <- list( main_edge= main_edge, intergene = intergene)
+venn.diagram(venn_list, filename = 'venn2.png', imagetype = 'png', 
+             fill = c("dodgerblue", "goldenrod1"), alpha = 0.50, cat.col = rep('black', 2), 
+             col = 'black', cex = 1.5, fontfamily = 'serif', 
+             cat.cex = 1.5, cat.fontfamily = 'serif')
+
+##############################################################
+#####################  hubgene setoff   ###############################
+#################################################################
+x=as.matrix(read.table("main_edge_lam_star1.85.txt"))
+
+y= c("FZD4","GRB10","FZD5","ATP6V1G3","IGF1","RPS6KA3","RPS6KA1")
+
+type1 =intersect(x,y)
+type2 = setdiff(x,y)
+type3 =setdiff(y,x)
+type3 
+write.table(type1,file = "type1_ov.txt",sep="\t",row.name=FALSE,col.name=FALSE)
+write.table(type2,file = "type2_ov.txt",sep="\t",row.name=FALSE,col.name=FALSE)
+write.table(type3,file = "type3_ov.txt",sep="\t",row.name=FALSE,col.name=FALSE)
+
+###
+
+remove(list=ls())
+load("Sensamp.Rdata") 
+load("Ressamp.Rdata") 
+
+n1=dim(Sensam)[1]
+datax=rbind(Sensam,Ressam)
+a1=datax[1:n1,]
+a2=datax[-1:-n1,]
+
+hubgens=c("IGF1")
+
+i=1
+hubgens[i]
+ttset=t.test(a1[,hubgens[i]],a2[,hubgens[i]])
+ttset$p.value
+
+############################################
+###############################
+#####可视化
+library("DiffGraph")
+est_main=(main_temp>lam_star)*main_temp
+est_main1=est_main
+est_main1[est_main1!=0]=1
+
+main.edge=  est_main1
+sum(main.edge)
+
+est_int = (int_temp>lam_star)*int_temp
+est_int1=est_int
+est_int1[est_int1!=0]=1
+Diff.edge.temp = upper.tri(est_int1)*est_int1
+sum( Diff.edge.temp)
+
+Diff.edge=Diff.edge.temp+t(Diff.edge.temp)
+row.names(Diff.edge) = colnames(Sensam)
+colnames(Diff.edge) = colnames(Sensam)
+Degree.Diff = apply(Diff.edge, 1, sum)
+Diff.graph.connected = Diff.edge[Degree.Diff>0, Degree.Diff>0]
+Diff.net.connected  = graph_from_adjacency_matrix(Diff.graph.connected, mode = "undirected", weighted = TRUE, diag = FALSE)
+Diff.net = graph_from_adjacency_matrix(Diff.edge, mode = "undirected", weighted = TRUE, diag = FALSE)
+
+tkid <- tkplot(Diff.net.connected, vertex.size= degree(Diff.net.connected)*1.2, layout =layout_with_fr,
+               vertex.color="red", vertex.group.cex=0.5, edge.width =1.2, edge.color="orange")
+# Visualize the estimated differential network in a non-interactive manner.
+# grab the coordinates from tkplot
+loc <- tkplot.getcoords(tkid)
+plot(Diff.net.connected, layout=loc, vertex.size= degree(Diff.net.connected)*1.2, vertex.color="red",
+     vertex.group.cex=0.8, edge.width =1.2, edge.color="orange")
+

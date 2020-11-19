@@ -1,0 +1,11 @@
+
+tkid <- tkplot(Diff.net.connected, vertex.size= degree(Diff.net.connected)*1.2, layout =layout_with_fr,
+               vertex.color="red", vertex.group.cex=0.5, edge.width =1.2, edge.color="orange")
+# Visualize the estimated differential network in a non-interactive manner.
+# grab the coordinates from tkplot
+loc <- tkplot.getcoords(tkid)
+plot(Diff.net.connected, layout=loc, vertex.size= degree(Diff.net.connected)*1.2, vertex.color="red",
+     vertex.group.cex=0.8, edge.width =1.2, edge.color="orange")
+
+
+#' @importFrom  igraph tkplot tkplot.getcoords graph_from_adjacency_matrix

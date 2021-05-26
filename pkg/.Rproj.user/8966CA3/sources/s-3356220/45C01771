@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1618626895735.000,
+    "dirty" : false,
+    "encoding" : "CP936",
+    "folds" : "",
+    "hash" : "911885931",
+    "id" : "45C01771",
+    "lastKnownWriteTime" : 1620608375,
+    "last_content_update" : 1620608375621,
+    "path" : "E:/TJJ-2018/chNet_BIO/version_chNet/chNet20210510/chNet_package/pkg/R/chNet.R",
+    "project_path" : "R/chNet.R",
+    "properties" : {
+        "cursorPosition" : "15,17",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -29,4 +29,4 @@ Taking the TCGA breast cancer datasets as an example, run the following code:
 data("TCGA.BRCA")
 result = chNet(TCGA.BRCA$X,TCGA.BRCA$group, lambar = 2.85, parallel = FALSE, nCpus = 4)
 
-Please do not hesitate to contact Dr. Xiao-Fei Zhang (zhangxf@mail.ccnu.edu.cn) or Miss Jia-Juan Tu (adaline_juan@mail.ccnu.edu.cn) to seek any clarifications regarding any  contents or operation of the archive.
+Please do not hesitate to contact Dr. Xiao-Fei Zhang (zhangxf@mail.ccnu.edu.cn) or Miss Jia-Juan Tu (adaline_juan@mails.ccnu.edu.cn) to seek any clarifications regarding any  contents or operation of the archive.

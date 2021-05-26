@@ -1,0 +1,7 @@
+library("roxygen2")
+library('devtools')
+load_all() 
+document()
+build()
+check()
+devtools::build_manual()

@@ -14,9 +14,11 @@ data("GSE13159.AML")
 \description{
 Gene expression datasets for acute myeloid leukemia (GSE13159) is download from http://discern-leelab.cs.washington.ed.
 There are 541 AML and 73 normal samples.
-The data only include expression measurements of genes that overlap
+The data include expression measurements of genes that overlap
 with the mTOR signaling pathway (hsa04150)  from the Kyoto Encyclopedia of
-Genes and Genomes databas. It includes an expression matrix for which the rows represent the
+Genes and Genomes databas and 50 non-differentially expressed  genes
+(Student's t-test, p-value > 0.05) with the highest variation AML samples.
+It includes an expression matrix for which the rows represent the
 samples and the columns represent the genes, and a vector denoting the group membership of each
 sample.
 }
@@ -24,7 +26,7 @@ sample.
 data("GSE13159.AML")
 }
 \references{
-Jia-Juan Tu, Le Ou-Yang, Hong Yan, Hong Qin and Xiao-Fei Zhang(2020), Differential network analysis
+Jia-Juan Tu, Le Ou-Yang, Hong Yan, Hong Qin and Xiao-Fei Zhang (2021), Differential network analysis
  by simultaneously considering  changes in  gene interactions and gene expression.
 }
 \seealso{

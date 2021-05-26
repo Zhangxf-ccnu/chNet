@@ -19,9 +19,11 @@ generate.data (p, n, umin, umax)
 \item{\code{X}}{ A matrix of sample  matrice  (\eqn{2n \times p}) from two different conditions.}
 \item{\code{group}}{ A matrix of sample label matrice  (\eqn{2n \times 1}) from two different conditions.}
 \item{\code{rho}}{A list (length = 2) of the partical coefficients matrices (\eqn{p \times p}).}
+\item{\code{hubgene}}{A set hub genes.}
 }
 \description{
-The complete procedure for generating simulated data. For details, refer to simulation study (Section 3.1 in the main text).
+The complete procedure for generating simulated data. For details, refer to
+simulation study (Supplementary Section 3.3.1 ).
 }
 \details{
 The function is used to generate the gene expression datasets.
@@ -31,7 +33,7 @@ The function is used to generate the gene expression datasets.
 data.x = generate.data(p = 100, n = 100, umin = 0.5, umax = 1)
 }
 \references{
-Jia-Juan Tu, Le Ou-Yang, Hong Yan, Hong Qin and Xiao-Fei Zhang(2020), Differential network analysis
+Jia-Juan Tu, Le Ou-Yang, Hong Yan, Hong Qin and Xiao-Fei Zhang (2021), Differential network analysis
  by simultaneously considering  changes in  gene interactions and gene expression.
 }
 \seealso{

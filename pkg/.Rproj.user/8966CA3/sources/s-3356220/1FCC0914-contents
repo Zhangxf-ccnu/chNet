@@ -1,0 +1,10 @@
+library("roxygen2")
+library('devtools')
+load_all() 
+document()
+build()
+check()
+#install()
+devtools::build_manual()
+
+C:\Windows\SysWOW64\Macromed

@@ -1,0 +1,454 @@
+
+remove(list=ls())
+
+
+# lode function
+source("compute.contrasts.R")
+source("get.knots.R")
+source("test.statistics.R")
+source("estimate.fdr.R")
+
+#########load data
+
+load("GSE13159.AML5np.Rdata") 
+
+dat = GSE13159.AML$X
+group = GSE13159.AML$group
+p=dim(dat)[2]
+
+ind1 = which(group=="cancer")
+ind2 = which(group=="normal")
+
+group1 = group
+group1[ind1]=1
+group1[ind2]=0
+cc <- compute.contrasts(dat,group1, type="Fisher") 
+
+knots <- get.knots(cc$w, cc$z)
+save(knots,file="knoteCHT.RData")
+
+
+##################
+genename=colnames(dat)
+
+lam_star= 3.75
+main_temp= knots$main.knots
+int_temp=knots$int.knots
+diag(int_temp)=0
+
+est_main=(main_temp>lam_star)*main_temp
+est_main1=est_main
+est_main1[est_main1!=0]=1
+sum(est_main1)
+
+
+est_int = (int_temp>lam_star)*int_temp
+est_int1=est_int
+est_int1[est_int1!=0]=1
+est_int1=upper.tri(est_int1)*est_int1
+sum(est_int1)
+
+##
+main.nams <- names(est_main1)
+indm=which(est_main1!=0)
+main_edge = main.nams[indm]
+
+
+
+diff_edge=c()
+for(i in 1:p){
+  for(j in 1:p){
+    if(est_int1[i ,j]!= 0){
+      temp_edge=c(genename[i],genename[j])
+      
+      diff_edge=rbind(temp_edge,diff_edge)
+    }
+  }
+  
+}
+sortgene = sort(table(diff_edge),decreasing = TRUE)
+length(sort(sortgene))
+
+#sortgene
+sortgene[1:7]
+
+hubgene=sortgene
+
+myfile= paste0( "CHTdiff_edge","_",'lam_star',lam_star,".csv")
+
+write.csv(diff_edge,myfile, row.names=F)
+
+
+myfile1= paste0( "CHTmain_edge_alm","_",'lam_star',lam_star,".csv")
+
+write.csv(main_edge,myfile1, row.names=F)
+
+
+myfile2= paste0( "CHTdiff_edge_alm","_p",p,"_",'lam_star',"_",lam_star,".txt")
+
+write.table(diff_edge,myfile2,sep="\t",row.name=FALSE,col.name=FALSE)
+
+myfile3= paste0("CHTmain_edge_alm","_p",p,"_",'lam_star',"_",lam_star,".txt")
+
+write.table(main_edge,myfile3,sep="\t",row.name=FALSE,col.name=FALSE)
+
+myfile4= paste0("CHThubgene_edge_alm","_p",p,"_",'d2',"_",'lam_star',"_",lam_star,".txt")
+
+write.table(hubgene,myfile4,sep="\t",row.name=FALSE,col.name=FALSE)
+
+#### the genes in the differential network
+intergene= row.names(as.matrix(sortgene))
+
+myfile5= paste0( "intergene_alm","_",'lam_star',lam_star,"CHT",".txt")
+
+write.csv(intergene,myfile5, row.names=F)
+
+
+################ the degree of the hub genes 
+remove(list=ls())
+hubgenss= as.matrix(read.table("hub_degree_alm_lam_star2.8.txt",sep = ",", header = TRUE))
+hubgens = hubgenss[,1]
+hubgens 
+len.gene = length(hubgens)
+
+hubgen_fre= as.matrix(read.table("CHThubgene_edge_alm_p188_d2_lam_star_3.75.txt",sep = "", header = TRUE))
+
+for (i in 1:len.gene ){
+  # print(hubgens [i])
+  cat("hubgene=",hubgens [i])
+  ind1 = which(hubgen_fre[ ,1]==hubgens [i])
+  hubgens_de = hubgen_fre[ ind1,2]
+  print(hubgens_de)
+  
+}
+#hubgens=c("ESR1","LEF1","IGF1R","RB1","CCND1","CDK6","CTNNB1","DLL3","HES1","IGF1","LRP6")
+
+
+
+##########################
+
+
+####################
+
+load("OURalm.Rdata") 
+est_our=est_int2
+est_our[est_our!=0]=1
+sum(est_our)
+CHT=est_int1
+sum(CHT)
+comedge=CHT*est_our
+sum(comedge)
+
+net_comm=comedge+CHT
+
+indx=which(net_comm==1, arr.ind=TRUE)
+indy=which(net_comm==2, arr.ind=TRUE)
+
+diff_edge_spec=c()
+for(i in 1:dim(indx)[1]){
+  
+  temp_edge=c(genename[indx[i,1]],genename[indx[i,2]],1)
+  
+  diff_edge_spec=rbind(temp_edge,diff_edge_spec)
+  
+}
+dim(diff_edge_spec)
+
+diff_edge_comm=c()
+for(i in 1:dim(indy)[1]){
+  
+  temp_edge=c(genename[indy[i,1]],genename[indy[i,2]],2)
+  
+  diff_edge_comm=rbind(temp_edge,diff_edge_comm)
+  
+}
+dim(diff_edge_comm)
+
+cht_com_spec_alm=rbind(diff_edge_spec,diff_edge_comm)
+
+myfilec= paste0( "cht_com_spec_alm",".txt")
+
+write.csv(cht_com_spec_alm,myfilec, row.names=F)
+
+myfilec1= paste0( "cht_com_spec_alm",".csv")
+
+write.csv(cht_com_spec_alm,myfilec1, row.names=F)
+##################### ourcom spec CHT 
+net_comm1=comedge+est_our
+
+indx1=which(net_comm1==1, arr.ind=TRUE)
+indy1=which(net_comm1==2, arr.ind=TRUE)
+
+diff_edge_spec1=c()
+for(i in 1:dim(indx1)[1]){
+  
+  temp_edge1=c(genename[indx1[i,1]],genename[indx1[i,2]],1)
+  
+  diff_edge_spec1=rbind(temp_edge1,diff_edge_spec1)
+  
+}
+dim(diff_edge_spec1)
+
+diff_edge_comm1=c()
+for(i in 1:dim(indy1)[1]){
+  
+  temp_edge1=c(genename[indy1[i,1]],genename[indy1[i,2]],2)
+  
+  diff_edge_comm1=rbind(temp_edge1,diff_edge_comm1)
+  
+}
+dim(diff_edge_comm1)
+
+our_com_spec_cht_alm=rbind(diff_edge_spec1,diff_edge_comm1)
+
+myfilec= paste0( "our_com_spec_cht_alm",".txt")
+
+write.csv(our_com_spec_cht_alm,myfilec, row.names=F)
+
+#############
+
+x1=diff_edge_spec[,1:2]
+x2=diff_edge_spec1[,1:2]
+x3=rbind(as.matrix(x1[,1]),as.matrix(x1[,2]))
+x4=rbind(as.matrix(x2[,1]),as.matrix(x2[,2]))
+
+x5 = unique(x3)
+x6 = unique(x4)
+x7 = intersect(x5,x6)
+
+##########################count triangle
+library(igraph)
+Diff.edge.temp = est_int1
+Diff.edge=Diff.edge.temp+t(Diff.edge.temp)
+row.names(Diff.edge) = colnames(dat)
+colnames(Diff.edge) = colnames(dat)
+Degree.Diff = apply(Diff.edge, 1, sum)
+Diff.graph.connected = Diff.edge[Degree.Diff>0, Degree.Diff>0]
+Diff.net.connected  = graph_from_adjacency_matrix(Diff.graph.connected, mode = "undirected", weighted = TRUE, diag = FALSE)
+Diff.net = graph_from_adjacency_matrix(Diff.edge, mode = "undirected", weighted = TRUE, diag = FALSE)
+
+sum(count_triangles(Diff.net.connected ))
+
+Diff.net = graph_from_adjacency_matrix(Diff.edge, mode = "undirected", weighted = TRUE, diag = FALSE)
+sum(count_triangles(Diff.net))
+matrix(triangles(Diff.net), nrow=3)
+
+
+###### The nondifferential genes
+cht_int_gene_temp=cht_com_spec_br[,1:2]
+cht_int_gene=rbind(as.matrix(cht_int_gene_temp[,1]),as.matrix(cht_int_gene_temp[,2]))
+ourgene=unique(cht_int_gene)
+
+diffgenes= as.matrix(read.table("main_edge_alm_lam_star2.8.txt",header =TRUE))
+
+chtnon = setdiff(ourgene,diffgenes)
+chtnon =sort(as.matrix(chtnon))
+
+
+myfilech= paste0( "cht_nondiff_alm",".txt")
+
+write.csv(chtnon,myfilech, row.names=F)
+
+
+
+
+
+
+
+
+## our and Pcor comm and special
+####################
+
+load("OURBR.Rdata") 
+est_our=est_int2
+est_our[est_our!=0]=1
+sum(est_our)
+CHT=est_int1
+sum(CHT)
+comedge=CHT*est_our
+sum(comedge)
+
+net_comm=comedge+Pcor
+net_comm1=comedge+est_our
+
+indx=which(net_comm==1, arr.ind=TRUE)
+indy=which(net_comm==2, arr.ind=TRUE)
+indx1=which(net_comm1==1, arr.ind=TRUE)
+
+diff_edge_spec=c()
+for(i in 1:dim(indx)[1]){
+  
+  temp_edge=c(genename[indx[i,1]],genename[indx[i,2]],1)
+  
+  diff_edge_spec=rbind(temp_edge,diff_edge_spec)
+  
+}
+dim(diff_edge_spec)
+
+diff_edge_comm=c()
+for(i in 1:dim(indy)[1]){
+  
+  temp_edge=c(genename[indy[i,1]],genename[indy[i,2]],2)
+  
+  diff_edge_comm=rbind(temp_edge,diff_edge_comm)
+  
+}
+dim(diff_edge_comm)
+
+#########our model special edges
+diff_edge_spec_our=c()
+for(i in 1:dim(indx1)[1]){
+  
+  temp_edge=c(genename[indx1[i,1]],genename[indx1[i,2]],3)
+  
+  diff_edge_spec_our=rbind(temp_edge,diff_edge_spec_our)
+  
+}
+dim(diff_edge_spec_our)
+
+ourCHT_com_spec=rbind(diff_edge_spec,diff_edge_comm,diff_edge_spec_our)
+
+myfilec= paste0( "ourCHT_com_spec",".csv")
+
+write.csv(ourCHT_com_spec,myfilec, row.names=F)
+
+
+###### The nondifferential genes
+
+diffgenes= as.matrix(read.table("main_edge_lam_star2.85.txt"))
+ourgene=unique(rbind(diff_edge_comm,diff_edge_spec_our))
+setdiff(ourgene,diffgenes)
+
+CHTgene=unique(rbind(diff_edge_comm,diff_edge_spec))
+setdiff( CHTgene,diffgenes)
+
+aa=intersect(setdiff(ourgene,diffgenes),setdiff( CHTgene,diffgenes))
+
+setdiff(setdiff(ourgene,diffgenes),aa)
+
+
+
+
+##################################################################
+####################boothtrap
+####################################################################
+remove(list=ls())
+
+load("Basalp.Rdata") 
+load("LumAp.Rdata") 
+
+p=dim(LumA)[2]
+
+dat = rbind(Basal, LumA)
+group=c(rep(0,dim(Basal)[1]),rep(1,dim(LumA)[1]))
+lambda =3.65
+source("Boothtrap.R")
+a=Boothtrap(dat, group,lambda, N =500)
+b=a$pnetest
+b=upper.tri(b)*b
+
+ind=sort(b,decreasing = TRUE)[1:10]
+indd=unique(ind)
+indx=c()
+for(i in 1:length(indd)){
+  indx_temp=which(b==indd[i], arr.ind=TRUE)
+  indx=rbind(indx,  indx_temp)
+  
+}
+indx
+
+
+####gene name:
+genename=colnames(LumA)
+genepro=c()
+for (j in 1: dim(indx)[1]){
+  indx[j]
+  int.nams_temp <- outer(genename[indx[j,1]], genename[indx[j,2]], paste, sep=":")
+  genepro_temp=cbind(int.nams_temp ,ind[j])
+  genepro=rbind(genepro,genepro_temp)
+}
+genepro
+
+
+
+
+
+
+
+
+##############################################################
+#####################  hubgene setoff   ###############################
+#################################################################
+remove(list=ls())
+x= as.matrix(read.table("CHTmain_edge_p139_lam_star_3.65.txt"))
+yy= as.matrix(read.table("CHThubgene_edge_p139_d2_lam_star_3.65.txt"))
+y=yy[,1]
+y
+type1 =intersect(x,y)
+type2 = setdiff(x,y)
+type3 =setdiff(y,x)
+type3
+
+write.table(type1,file = "CHT_type1_p2000.txt",sep="\t",row.name=FALSE,col.name=FALSE)
+write.table(type2,file = "CHT_type2_p2000.txt",sep="\t",row.name=FALSE,col.name=FALSE)
+write.table(type3,file = "CHT_type3_p2000.txt",sep="\t",row.name=FALSE,col.name=FALSE)
+
+##########################################
+## geneset enrichment
+y= as.matrix(read.table("diff_edge_p500_lam_star_2.txt"))
+y1=y[-1,]
+
+##
+
+remove(list=ls())
+
+
+y= as.matrix(read.table("Breast_Cancer_Pathway.txt"))
+
+xx= as.matrix(read.table("diff_edge_p500_lam_star_2.txt"))
+length(table(xx))
+
+x=rbind(as.matrix( xx[,1]),as.matrix( xx[,2]))
+
+xnam=unique(x)
+
+setdiff(y,xx)
+union(y,xx)
+intersect(y,xx)
+aa=colnames(Basal)
+length(intersect(y,aa))
+
+
+###################visiual and couting triangle
+
+library(igraph)
+est_main=(main_temp>lam_star)*main_temp
+est_main1=est_main
+est_main1[est_main1!=0]=1
+
+main.edge=  est_main1
+sum(main.edge)
+
+est_int = (int_temp>lam_star)*int_temp
+est_int1=est_int
+est_int1[est_int1!=0]=1
+Diff.edge.temp = upper.tri(est_int1)*est_int1
+sum( Diff.edge.temp)
+
+Diff.edge=Diff.edge.temp+t(Diff.edge.temp)
+row.names(Diff.edge) = colnames(Basal)
+colnames(Diff.edge) = colnames(Basal)
+Degree.Diff = apply(Diff.edge, 1, sum)
+Diff.graph.connected = Diff.edge[Degree.Diff>0, Degree.Diff>0]
+Diff.net.connected  = graph_from_adjacency_matrix(Diff.graph.connected, mode = "undirected", weighted = TRUE, diag = FALSE)
+Diff.net = graph_from_adjacency_matrix(Diff.edge, mode = "undirected", weighted = TRUE, diag = FALSE)
+sum(count_triangles(Diff.net))
+
+tkid <- tkplot(Diff.net.connected, vertex.size= degree(Diff.net.connected)*1.2, layout =layout_with_fr,
+               vertex.color="red", vertex.group.cex=0.5, edge.width =1.2, edge.color="orange")
+# Visualize the estimated differential network in a non-interactive manner.
+# grab the coordinates from tkplot
+loc <- tkplot.getcoords(tkid)
+plot(Diff.net.connected, layout=loc, vertex.size= degree(Diff.net.connected)*1.2, vertex.color="red",
+     vertex.group.cex=0.8, edge.width =1.2, edge.color="orange")
+

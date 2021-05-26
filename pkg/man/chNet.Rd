@@ -4,20 +4,25 @@
 \alias{chNet}
 \title{Differential network analysis by simultaneously considering  changes in gene interactions and gene expression}
 \usage{
-chNet (X,group,lambar,parallel,nCpus)
+chNet (X,group,subsampling,R,lambar,parallel,nCpus)
 }
 \arguments{
 \item{X}{Data matrix for which the rows represent the samples and the columns represent the genes.}
 
 \item{group}{Vector which defines two groups of samples under comparison.}
 
+\item{subsampling}{Logical value to indicate if the process should be run to obtain a weight matrix, default to FALSE.}
+
+\item{R}{The number of sub-sampled datasets; default is 20.}
+
 \item{lambar}{The tuning (threshold) parameter controls the sparsity level.}
 
 \item{parallel}{Logical value to indicate if the process should be run parallelly in multiple threads, default to FALSE.}
 
-\item{nCpus}{number of (maximum) cores to use for parallel execution, default to 4.}
+\item{nCpus}{Number of (maximum) cores to use for parallel execution, default to 4.}
 }
 \value{
+\item{\code{diff.edge.weight}}{the estimated weighted differential network.}
 \item{\code{diff.edge}}{the adjacency matrix of the estimated differential network.}
 \item{\code{diff.gene}}{the adjacency matrix of the estimated differentially expressed genes.}
 \item{\code{Diff.net}}{the estimated differential network over all genes.}
@@ -25,31 +30,35 @@ chNet (X,group,lambar,parallel,nCpus)
 }
 \description{
 The complete procedure for estimating differential network
- using chNet. For details, refer to method (Section 2.4 in the main text).
+ using chNet. For details, refer to method (Sections 2.4  and 2.5 in the main text).
 }
 \details{
 This function is implemented to infer diffferential network that satisfy hierarchichal constraints.
-We first define the differential network as the difference of partial correlations,
+We first define the differential network as the difference of partial correlations from two different conditions,
 and develop a new  test statistic to quantify the change of partial correlations.
 Then the Student's t-test statistic is used to quantify the changes in expression levels of individual genes.
 Finally, an optimization model is developed to combine the two different types of test statistics so that the
 estimated differential networks exhibit the hierarchical structures.
-A closed-formed solution is derived to solve the optimization model.
+A closed-formed solution is derived to solve the optimization model. In addition, based on sub-sampling  experiments,
+a weighted hierarchial differential network can also be inferred.
 }
 \examples{
 # Simulation data
 data.x= generate.data(p = 100, n = 100, umin = 0.5, umax = 1)
-result = chNet(data.x$X,data.x$group, lambar = 4, parallel = FALSE, nCpus = 4)
+result = chNet(data.x$X,data.x$group, subsampling = FALSE, R= 20,
+lambar = 3, parallel = FALSE, nCpus = 4)
 
 # TCGA breast cancer data
 data("TCGA.BRCA")
-result = chNet(TCGA.BRCA$X,TCGA.BRCA$group, lambar = 2.85, parallel = FALSE, nCpus = 4)
+result = chNet(TCGA.BRCA$X,TCGA.BRCA$group,subsampling = FALSE, R= 20,
+ lambar = 2.825, parallel = FALSE, nCpus = 4)
 # GSE13159 AML
 data("GSE13159.AML")
-result = chNet(TCGA.BRCA$X,TCGA.BRCA$group, lambar = 2.7, parallel = FALSE, nCpus = 4)
+result = chNet(TCGA.BRCA$X,TCGA.BRCA$group,subsampling = FALSE, R= 20,
+lambar = 2.8, parallel = FALSE, nCpus = 4)
 }
 \references{
-Jia-Juan Tu, Le Ou-Yang, Hong Yan, Hong Qin and Xiao-Fei Zhang(2020), Differential network analysis
+Jia-Juan Tu, Le Ou-Yang, Hong Yan, Hong Qin and Xiao-Fei Zhang (2021), Differential network analysis
  by simultaneously considering  changes in  gene interactions and gene expression.
 }
 \seealso{
